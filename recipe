@@ -38,7 +38,7 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
     #Install Plumed 2.5.3
     wget https://github.com/plumed/plumed2/releases/download/v2.5.3/plumed-2.5.3.tgz
     tar xfz plumed-2.5.3.tgz
-    cd plumed-2.5.3.tgz
+    cd plumed-2.5.3
     ./configure --prefix=usr/local
     make
     make install
