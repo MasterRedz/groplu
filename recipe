@@ -75,7 +75,7 @@ From: nvidia/cuda:10.1-devel-centos7
 
     #Install CMake 3
     wget https://cmake.org/files/v3.12/cmake-3.12.3.tar.gz
-    tar xfz cmake-3.12.3
+    tar xfz cmake-3.12.3.tar.gz
     cd cmake-3.12.3
     export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib:/usr/local/lib64:/usr/lib64
     ./bootstrap
