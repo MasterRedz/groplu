@@ -1,7 +1,7 @@
 # A Bootstrap that use the Docker Container Library
 Bootstrap: docker
 # Contatiner image
-From: nvidia/cuda:10.1-devel-ubuntu18.04
+From: nvidia/cuda:10.1-devel-centos7
 
 # Store metadata with your containers add labels section
 %labels
@@ -13,13 +13,64 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
     apt-get -y update
     apt-get install -y \
         build-essential \
-        openssh-server \
-        cmake \
-        tar \
-        nano \
-        sudo \
-        git \
-        wget
+	autoconf  \
+	ca-certificates  \
+	cmake \
+	cython \
+	cython3 \
+	g++ \
+	gawk \
+	gfortran-7  \
+	git \
+	gsl-bin \
+	libgsl-dev \
+	gnuplot \
+	libblacs-mpi-dev  \
+	libblacs-openmpi1  \
+	libfftw3-3  \
+	libfftw3-bin  \
+	libfftw3-dev  \
+	libfftw3-doc  \
+	libfftw3-double3   \
+	libgfortran-7-dev  \
+	libgomp1 \
+	libmatheval1 \
+	libmatheval-dev \
+	libopenblas-base  \
+	libopenblas-dev  \
+	libopenmpi-dev  \
+	libxext-dev \
+	make  \
+	nano \
+	net-tools  \
+	openssh-server  \
+	patch \
+	python \
+	python-backports-shutil-get-terminal-size \
+	python-dev \
+	python-matplotlib \
+	python3-matplotlib \
+	python-numpy \
+	python3-numpy \
+	python3-numpydoc \
+	python-os-client-config \
+	python-os-service-types \
+	python-pip \
+	python3-pip \
+	python-scipy \
+	python3-scipy \
+	python-setuptools \
+	python3-setuptools \
+	python-subprocess32 \
+	python3-whichcraft \
+	sudo  \
+	tar \
+	vim \
+	wget  \
+	xxd \
+	xxdiff \
+	zlib1g \
+	zlib1g-dev 	
 
     # Instal OpenMPI 3.1.2
     mkdir -p /tmp/mpi
@@ -39,20 +90,22 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
     wget https://github.com/plumed/plumed2/releases/download/v2.5.3/plumed-2.5.3.tgz
     tar xfz plumed-2.5.3.tgz
     cd plumed-2.5.3
-    ./configure --prefix=usr/local
-    make
+    ./configure  --enable-modules=all CXXFLAGS=-O3; 
+    make -j 4
     make install
-
+    cd pyhton
+    pip install plumed
+    
     # Install Gromacs 2019
     mkdir -p /tmp/gromacs
     cd /tmp/gromacs
 
     wget http://ftp.gromacs.org/pub/gromacs/gromacs-2019.4.tar.gz
     tar xfz gromacs-2019.4.tar.gz
-    
     cd gromacs-2019.4
+    ./plumed-2.5.3/sourceme.sh
+    plumed patch -p -e gromacs-2019.4
     mkdir -p build
-    plumed patch -p
     cd build
     cmake .. \
         -DGMX_GPU=ON \
