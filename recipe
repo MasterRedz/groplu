@@ -10,8 +10,8 @@ From: nvidia/cuda:10.1-devel-centos7
 # from the host to your container in this section, but you can of 
 # course download with commands like git clone and wget and curl.
 %post
-    apt-get -y update
-    apt-get install -y \
+    yum -y update
+    yum install -y \
         build-essential \
 	autoconf  \
 	ca-certificates  \
