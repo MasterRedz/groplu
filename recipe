@@ -12,10 +12,8 @@ From: nvidia/cuda:10.1-devel-centos7
 %post
     yum -y update
     yum install -y \
-        build-essential \
 	autoconf  \
 	ca-certificates  \
-	cmake3\
 	cython \
 	cython3 \
 	g++ \
@@ -75,7 +73,16 @@ From: nvidia/cuda:10.1-devel-centos7
 	zlib1g-dev 
     yum -y update
 
-    # Instal OpenMPI 3.1.2
+    #Install CMake 3
+    wget https://cmake.org/files/v3.12/cmake-3.12.3.tar.gz
+    tar zxvf cmake-3.12.3
+    cd cmake-3.12.3
+    export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib:/usr/local/lib64:/usr/lib64
+    ./bootstrap
+    make -j 4
+    make install
+    
+    #Install OpenMPI 3.1.2
     mkdir -p /tmp/mpi
     cd /tmp/mpi
 
