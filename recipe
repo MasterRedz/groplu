@@ -1,6 +1,6 @@
 # A Bootstrap that use the Docker Container Library
 Bootstrap: docker
-# Contatiner image
+# Container image
 From: nvidia/cuda:10.1-devel-centos7
 
 # Store metadata with your containers add labels section
@@ -100,7 +100,7 @@ From: nvidia/cuda:10.1-devel-centos7
     wget https://github.com/plumed/plumed2/releases/download/v2.5.3/plumed-2.5.3.tgz
     tar xfz plumed-2.5.3.tgz
     cd plumed-2.5.3
-    ./configure  --enable-modules=all CXXFLAGS=-O3; 
+    ./configure --enable-modules=all CXXFLAGS=-O3; 
     make -j 4
     make install
     
