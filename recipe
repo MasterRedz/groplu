@@ -103,8 +103,7 @@ From: nvidia/cuda:10.1-devel-centos7
     wget http://ftp.gromacs.org/pub/gromacs/gromacs-2019.4.tar.gz
     tar xfz gromacs-2019.4.tar.gz
     cd gromacs-2019.4
-    ./plumed-2.5.3/sourceme.sh
-    plumed patch -p -e gromacs-2019.4
+    plumed patch -p
     mkdir -p build
     cd build
     cmake .. \
