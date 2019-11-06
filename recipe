@@ -126,7 +126,7 @@ From: nvidia/cuda:10.1-devel-centos7
     make
     # make check # The test fails because MPI is run as root when the image is build
     make install
-    # source /usr/local/gromacs/bin/GMXRC
+    source /usr/local/gromacs/bin/GMXRC
 
 # Place contaner environmet variables here
 %environment
