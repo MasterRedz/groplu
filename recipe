@@ -121,7 +121,7 @@ From: nvidia/cuda:10.1-devel-centos7
         -DGMX_BUILD_OWN_FFTW=ON \
         -DCMAKE_CXX_COMPILER=/usr/local/bin/mpic++ \
         -DCMAKE_C_COMPILER=/usr/local/bin/mpicc \
-	-DBUILD_SHARED_LIBS=OFF \
+	-DBUILD_SHARED_LIBS=ON \
 	-DGMX_PREFER_STATIC_LIBS=ON 
     make
     # make check # The test fails because MPI is run as root when the image is build
