@@ -116,8 +116,10 @@ From: nvidia/cuda:10.1-devel-centos7
     cd build
     cmake .. \
         -DGMX_GPU=ON \
+	-DGMX_MPI= ON \
         -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda \
         -DGMX_BUILD_OWN_FFTW=ON \
+	-DGMX_SIMD=AVX_512 \
         -DCMAKE_CXX_COMPILER=/usr/local/bin/mpic++ \
         -DCMAKE_C_COMPILER=/usr/local/bin/mpicc \
 	-DGMX_PREFER_STATIC_LIBS=ON \
