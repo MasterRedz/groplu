@@ -64,8 +64,6 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
     cmake .. \
         -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs \
         -DGMX_BUILD_OWN_FFTW=ON \
-	-DGMX_MPI=ON \
-	-DGMX_GPU=ON \
 	-DGMX_SIMD=AVX_512 \
 	-DCMAKE_CXX_COMPILER=/usr/bin/mpicxx \
         -DCMAKE_C_COMPILER=/usr/bin/mpicc \
