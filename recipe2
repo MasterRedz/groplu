@@ -1,68 +1,101 @@
+Bootstrap: docker
+From: nvidia/cuda:10.1-devel-ubuntu18.04
 
-DEBIAN_FRONTEND=noninteractive
-apt update; apt -yq upgrade; \
-	apt install -yq \
- 		autoconf  \
-    ca-certificates  \
+# Store metadata with your containers add labels section
+%labels
+
+# Use it to install container dependencies. You cannot copy files 
+# from the host to your container in this section, but you can of 
+# course download with commands like git clone and wget and curl.
+%post
+        DEBIAN_FRONTEND=noninteractive
+	apt -y update
+	apt install -y \
+		--no-install-recommends \
 		cmake \
-		cython \
-		cython3 \
+                git \
+		gfortran-7 \
 		g++ \
 		gawk \
-    gfortran-7  \
-		git \
-		gsl-bin \
-		libgsl-dev \
-		gnuplot \
- 		libblacs-mpi-dev  \
- 		libblacs-openmpi1  \
-    libfftw3-3  \
- 		libfftw3-bin  \
-  	libfftw3-dev  \
-  	libfftw3-doc  \
-    libfftw3-double3   \
-    libgfortran-7-dev  \
-		libgomp1 \
-		libmatheval1 \
+		hwloc \
+		libopenblas-base \
+		libopenblas-dev \
+		libfftw3-dev \
+		libopenmpi-dev \
 		libmatheval-dev \
-    libopenblas-base  \
-    libopenblas-dev  \
- 		libopenmpi-dev  \
-		libxext-dev \
- 		make  \
+		libgomp1 \
+		make \
  		net-tools  \
- 		openmpi-bin   \
- 		openmpi-common \
- 		openmpi-doc   \
- 		openssh-server  \
-		patch \
+		openmpi-bin \
+ 		openssh-client  \
 		python \
-    python-backports-shutil-get-terminal-size \
-		python-dev \
-		python-matplotlib \
-		python3-matplotlib \
-		python-numpy \
-    python3-numpy \
-    python3-numpydoc \
-		python-os-client-config \
-		python-os-service-types \
-		python-pip \
-		python3-pip \
-		python-scipy \
-    python3-scipy \
-		python-setuptools \
-    python3-setuptools \
-		python-subprocess32 \
-    python3-whichcraft \
+		patch \
  		sudo  \
+		tar \
 		vim \
  		wget  \
 		xxd \
 		xxdiff \
-    zlib1g \
-		zlib1g-dev \
-		--no-install-recommends \
-	&& apt autoremove   -y \
-	&& rm -rf /var/apt/lists/* 
-  
-  
+    		zlib1g \
+		zlib1g-dev 
+	apt clean
+
+    cd /tmp
+    git clone --branch "v2.5.3" https://github.com/plumed/plumed2.git /plumed2
+    cd /plumed2
+    ./configure --prefix=/usr/local/plumed --enable-modules=all CXX=mpicxx CXXFLAGS=-O3;
+    make -j 24
+    make install
+
+    export PATH="/usr/local/plumed/bin:${PATH}"
+    export PLUMED_KERNEL="/usr/local/plumed/lib/libplumedKernel.so"
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/plumed/lib/"
+
+
+    cd /tmp
+    wget http://ftp.gromacs.org/pub/gromacs/gromacs-2019.4.tar.gz
+    tar xfz gromacs-2019.4.tar.gz
+    cd gromacs-2019.4
+    plumed patch -p -e gromacs-2019.4
+    mkdir -p build
+    cd build
+    cmake .. \
+        -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs \
+        -DGMX_BUILD_OWN_FFTW=ON \
+	-DGMX_GPU=ON \
+	-DGMX_USE_NVML=ON \
+	-DGMX_SIMD=AVX_512 \
+	-DCMAKE_CXX_COMPILER=/usr/bin/mpicxx \
+        -DCMAKE_C_COMPILER=/usr/bin/mpicc \
+	-DGMX_PREFER_STATIC_LIBS=ON \
+	-DBUILD_SHARED_LIBS=OFF 
+ 
+    make -j 24
+    make install
+    
+    export PATH="/usr/local/gromacs/bin:${PATH}"
+    /bin/bash -c "source /usr/local/gromacs/bin/GMXRC.bash"
+
+# Place container environmet variables here
+%environment
+    PATH="/usr/local/gromacs/bin:${PATH}"
+    PATH="/usr/local/plumed/bin:${PATH}"
+    PLUMED_KERNEL="/usr/local/plumed/lib/libplumedKernel.so"
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/plumed/lib/"
+    
+# The %runscript is another scriptlet, but it does not get executed during bootstrapping. 
+# Instead it gets persisted within the container to a file called /singularity which is 
+# the execution driver when the container image is run (either via the singularity run 
+# command or via executing the container directly).
+# When the %runscript is executed, all options are passed along to the executing script 
+# at runtime, this means that you can (and should) manage argument processing from within 
+# your runscript. Here is an example of how to do that.
+%runscript
+
+# You may choose to add a %test section to your definition file. This section will be run at 
+# the very end of the boostrapping process and will give you a chance to validate the container 
+# during the bootstrap process. You can also execute this scriptlet through the container itself,
+# such that you can always test the validity of the container itself as you transport it to different hosts.
+# Extending on the above Open MPI %post, consider this example:
+#%test
+#   echo "The test section was executed"
