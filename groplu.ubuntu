@@ -11,8 +11,8 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
 # course download with commands like git clone and wget and curl.
 %post
         DEBIAN_FRONTEND=noninteractive
-	apt -y update
-	apt install -y \
+	apt-get -y update
+	apt-get install -y \
 		--no-install-recommends \
 		cmake \
                 git \
@@ -40,7 +40,7 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
 		xxdiff \
     		zlib1g \
 		zlib1g-dev 
-	apt clean
+	apt-get clean
 
     cd /tmp
     git clone --branch "v2.5.3" https://github.com/plumed/plumed2.git /plumed2
