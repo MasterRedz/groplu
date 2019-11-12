@@ -16,10 +16,10 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
 		--no-install-recommends \
 		cmake \
                 git \
-		gfortran-7 \
 		g++ \
 		gawk \
 		hwloc \
+		cuda-compiler-10-0 \
 		libopenblas-base \
 		libopenblas-dev \
 		libfftw3-dev \
@@ -58,19 +58,18 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
     wget http://ftp.gromacs.org/pub/gromacs/gromacs-2019.4.tar.gz
     tar xfz gromacs-2019.4.tar.gz
     cd gromacs-2019.4
-    plumed patch -p -e gromacs-2019.4
+    plumed patch -p --runtime -e gromacs-2019.4
     mkdir -p build
     cd build
     cmake .. \
         -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs \
         -DGMX_BUILD_OWN_FFTW=ON \
-	-DGMX_THREAD_MPI=ON \
+	-DGMX_MPI=ON \
+	-DGMX_GPU=ON \
 	-DGMX_SIMD=AVX_512 \
+	-DGMX_USE_NVML=OFF \
 	-DCMAKE_CXX_COMPILER=/usr/bin/mpicxx \
-        -DCMAKE_C_COMPILER=/usr/bin/mpicc \
-	-DGMX_PREFER_STATIC_LIBS=ON \
-	-DBUILD_SHARED_LIBS=OFF 
- 
+        -DCMAKE_C_COMPILER=/usr/bin/mpicc 
     make -j 24
     make install
     
