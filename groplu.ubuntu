@@ -69,7 +69,6 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
 	-DGMX_SIMD=AVX_512 \
 	-DCMAKE_CXX_COMPILER=/usr/bin/mpicxx \
         -DCMAKE_C_COMPILER=/usr/bin/mpicc \
-	-DBUILD_SHARED_LIBS=OFF \
 	-DGMX_PREFER_STATIC_LIBS=ON
 	
     make -j 24
