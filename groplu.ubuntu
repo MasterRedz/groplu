@@ -45,7 +45,7 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
     cd /tmp
     git clone --branch "v2.5.3" https://github.com/plumed/plumed2.git /plumed2
     cd /plumed2
-    ./configure --prefix=/usr/local/plumed --enable-modules=all CXX=mpicxx CXXFLAGS=-O3;
+    ./configure --prefix=/usr/local/plumed --enable-modules=all --disable-mpi CXXFLAGS=-O3;
     make -j 24
     make install
 
@@ -63,10 +63,11 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
     cd build
     cmake .. \
         -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs \
-        -DGMX_BUILD_OWN_FFTW=OFF \
+        -DGMX_BUILD_OWN_FFTW=ON \
 	-DGMX_GPU=ON \
 	-DGMX_SIMD=AVX_512 \
-	-DGMX_USE_NVML=OFF
+	-DGMX_USE_NVML=OFF \
+	-DGMX_BUILD_MDRUN_ONLY=ON
 	
     make -j 24
     make install
