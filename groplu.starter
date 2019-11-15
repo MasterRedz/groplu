@@ -1,0 +1,78 @@
+# A Bootstrap that use the Docker Container Library
+Bootstrap: docker
+# Container image
+From: nvidia/cuda:10.1-devel-ubuntu18.04
+
+# Store metadata with your containers add labels section
+%labels
+
+# Use it to install container dependencies. You cannot copy files 
+# from the host to your container in this section, but you can of 
+# course download with commands like git clone and wget and curl.
+%post
+    DEBIAN_FRONTEND=noninteractive
+	  apt-get -y update
+	  apt-get install -y \
+		--no-install-recommends \
+		cmake \
+    git \
+		g++ \
+		gawk \
+		hwloc \
+		cuda-compiler-10-0 \
+		libopenblas-base \
+		libopenblas-dev \
+		libfftw3-dev \
+		libopenmpi-dev \
+		libmatheval-dev \
+		libgomp1 \
+		make \
+ 		net-tools  \
+		openmpi-bin \
+ 		openssh-client  \
+		python \
+		patch \
+ 		sudo  \
+		tar \
+		vim \
+ 		wget  \
+		xxd \
+		xxdiff \
+    zlib1g \
+		zlib1g-dev 
+	  apt-get clean
+
+    cd /tmp
+    git clone --branch "v2.5.3" https://github.com/plumed/plumed2.git /plumed2
+    cd /plumed2
+    ./configure --prefix=/usr/local/plumed --enable-modules=all --disable-mpi CXXFLAGS=-O3;
+    make -j 24
+    make install
+
+    export PATH="/usr/local/plumed/bin:${PATH}"
+    export PLUMED_KERNEL="/usr/local/plumed/lib/libplumedKernel.so"
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/plumed/lib/"
+
+# Place container environmet variables here
+%environment
+
+    PATH="/usr/local/plumed/bin:${PATH}"
+    PLUMED_KERNEL="/usr/local/plumed/lib/libplumedKernel.so"
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/plumed/lib/"
+    
+# The %runscript is another scriptlet, but it does not get executed during bootstrapping. 
+# Instead it gets persisted within the container to a file called /singularity which is 
+# the execution driver when the container image is run (either via the singularity run 
+# command or via executing the container directly).
+# When the %runscript is executed, all options are passed along to the executing script 
+# at runtime, this means that you can (and should) manage argument processing from within 
+# your runscript. Here is an example of how to do that.
+%runscript
+
+# You may choose to add a %test section to your definition file. This section will be run at 
+# the very end of the boostrapping process and will give you a chance to validate the container 
+# during the bootstrap process. You can also execute this scriptlet through the container itself,
+# such that you can always test the validity of the container itself as you transport it to different hosts.
+# Extending on the above Open MPI %post, consider this example:
+#%test
+#   echo "The test section was executed"
