@@ -63,9 +63,8 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
     cd build
     cmake .. \
         -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs \
-        -DGMX_BUILD_OWN_FFTW=OFF \
-	-DGMX_GPU=ON \
-	-DGMX_USE_NVML=OFF 
+        -DGMX_BUILD_OWN_FFTW=ON \
+	-DGMX_GPU=ON
 	
     make -j 24
     make install
