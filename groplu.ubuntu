@@ -83,7 +83,6 @@ From: nvidia/cuda:10.1-devel-ubuntu18.04
 # Instead it gets persisted within the container to a file called /singularity which is 
 # the execution driver when the container image is run (either via the singularity run 
 # command or via executing the container directly).
-
 # When the %runscript is executed, all options are passed along to the executing script 
 # at runtime, this means that you can (and should) manage argument processing from within 
 # your runscript. Here is an example of how to do that.
