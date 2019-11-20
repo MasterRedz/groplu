@@ -1,0 +1,88 @@
+# A Bootstrap that use the Docker Container Library
+Bootstrap: docker
+# Container image
+From: nvidia/cuda:10.1-devel-centos7
+
+# Store metadata with your containers add labels section
+%labels
+
+# Use it to install container dependencies. You cannot copy files 
+# from the host to your container in this section, but you can of 
+# course download with commands like git clone and wget and curl.
+%post
+    yum -y update
+    yum -y groupinstall 'Development Tools' 
+    yum -y install epel-release /
+      openmpi3.x86_64 \
+      openmpi3-devel \
+      wget \
+      git \
+      bzip2 \
+      tar \
+      cmake3.x86_64 \
+      make.x86_64
+    
+    export PATH="/usr/lib64/openmpi3/bin:$PATH"
+    export CPATH="/usr/include/openmpi3-x86_64"
+    
+    #Install GCC 8.3.0
+    wget ftp://mirror.csclub.uwaterloo.ca/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.gz
+    tar xfz gcc-8.3.0.tar.gz
+    mkdir -p build
+    contrib/download_prerequisites
+    cd build 
+    ../configure --enable-languages=c,c++ --enable-threads=posix --enable-bootstrap --disable-multilib
+    make -j 24
+    make install
+
+    #Install Plumed 2.5.3
+    wget https://github.com/plumed/plumed2/releases/download/v2.5.3/plumed-2.5.3.tgz
+    tar xfz plumed-2.5.3.tgz
+    cd plumed-2.5.3
+    ./configure --enable-modules=all CXXFLAGS=-O3; 
+    make -j 24
+    make install
+    
+    cd 
+    # Install Gromacs 2019
+    mkdir -p /tmp/gromacs
+    cd /tmp/gromacs
+
+    wget http://ftp.gromacs.org/pub/gromacs/gromacs-2019.4.tar.gz
+    tar xfz gromacs-2019.4.tar.gz
+    cd gromacs-2019.4
+    plumed patch -p -e gromacs-2019.4
+    mkdir -p build
+    cd build
+    cmake3 .. \
+        -DGMX_GPU=ON \
+        -DGMX_BUILD_OWN_FFTW=ON \
+        -DBUILD_SHARED_LIBS=OFF \
+	      -DGMX_PREFER_STATIC_LIBS=ON 
+    make -j 24
+    # make check # The test fails because MPI is run as root when the image is build
+    make install
+    source /usr/local/gromacs/bin/GMXRC
+
+# Place contaner environmet variables here
+%environment
+    export PATH="/usr/local/gromacs/bin/:$PATH"
+    export LD_LIBRARY_PATH="/usr/local/lib/:$LD_LIBRARY_PATH"
+
+# The %runscript is another scriptlet, but it does not get executed during bootstrapping. 
+# Instead it gets persisted within the container to a file called /singularity which is 
+# the execution driver when the container image is run (either via the singularity run 
+# command or via executing the container directly).
+
+# When the %runscript is executed, all options are passed along to the executing script 
+# at runtime, this means that you can (and should) manage argument processing from within 
+# your runscript. Here is an example of how to do that.
+%runscript
+
+# You may choose to add a %test section to your definition file. This section will be run at 
+# the very end of the boostrapping process and will give you a chance to validate the container 
+# during the bootstrap process. You can also execute this scriptlet through the container itself,
+# such that you can always test the validity of the container itself as you transport it to different hosts.
+# Extending on the above Open MPI %post, consider this example:
+#%test
+#   echo "The test section was executed"
